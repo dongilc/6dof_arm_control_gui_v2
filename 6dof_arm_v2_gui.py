@@ -5,12 +5,13 @@ import platform
 from PySimpleGUI.PySimpleGUI import T
 import serial
 import time
-import vesc_pyserial as vs
+from openrobot_vesc_pyserial import vesc_pyserial as vs
+from openrobot_vesc_pyserial import vesc_pcan as vp
 from threading import Timer
 
 ######################### Class Init #########################
 # pcan
-pcan = vs.PCAN()
+pcan = vp.PCAN()
 
 # default serial
 selected_ser_name = ''
@@ -317,7 +318,7 @@ logging_layout = [ [sg.Text("Anything printed will display here!"),
                     sg.Button('DEBUG PRINT OFF'),
                     sg.Button('NON Status CAN MSG Print ON'),
                     sg.Button('NON Status CAN MSG Print OFF')],
-                   [sg.Output(size=(162,20), font='Courier 8', key='-OUTPUT-')],
+                   #[sg.Output(size=(162,20), font='Courier 8', key='-OUTPUT-')],
                    [sg.Text("Terminal Command to"), 
                     sg.Combo(values=joint_list, default_value=joint_list[0], readonly=True, k='-TARGET_JOINT-'), 
                     sg.Input(size=(109,1), focus=True, key='-TERMINAL_INPUT-'), sg.Button('Terminal SEND', bind_return_key=True)],
@@ -336,7 +337,7 @@ layout_main = [ [sg.Column(layout_col1),
 make_dpi_aware()
 #print(platform.architecture())
 # Create the Window
-window = sg.Window('Window Title', layout_main)
+window = sg.Window('6-DOF Manipulator Control GUI Ver2', layout_main)
 
 ######################### GUI Event Loop #########################
 # Event Loop to process "events" and get the "values" of the inputs
@@ -483,21 +484,23 @@ while True:
         window['-OUTPUT-'].update(value='')
 
     if event == "NON Status CAN MSG Print ON":
-        vs.debug_non_status_can_msg_print = True
+        pcan.debug_non_status_can_msg_print = True
         print("NON Status CAN MSG Print ON")
     
     if event == "NON Status CAN MSG Print OFF":
-        vs.debug_non_status_can_msg_print = False
+        pcan.debug_non_status_can_msg_print = False
         print("NON Status CAN MSG Print OFF")
 
     if event == "DEBUG PRINT ON":
-        vs.debug_print_get_value_return = True
-        vs.debug_print_custom_return = True
+        selected_ser_class = get_serial_class_from_port_name(selected_ser_name)
+        selected_ser_class.debug_print_get_value_return = True
+        selected_ser_class.debug_print_custom_return = True
         print("DEBUG PRINT ON")
 
     if event == "DEBUG PRINT OFF":
-        vs.debug_print_get_value_return = False
-        vs.debug_print_custom_return = False
+        selected_ser_class = get_serial_class_from_port_name(selected_ser_name)
+        selected_ser_class.debug_print_get_value_return = False
+        selected_ser_class.debug_print_custom_return = False
         print("DEBUG PRINT OFF")
 
     if event == "Terminal SEND":
