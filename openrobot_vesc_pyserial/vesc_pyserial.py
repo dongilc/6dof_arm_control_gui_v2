@@ -260,7 +260,7 @@ class VESC_USB:
                 self.values.tacho_abs = self.get_bytes(data_frame[ind_f:ind_f+4], 1); ind_f += 4
                 self.values.fault = self.get_bytes(data_frame[ind_f:ind_f+1]); ind_f += 1
                 self.values.pid_pos_now = self.get_bytes(data_frame[ind_f:ind_f+4], 1000000); ind_f += 4
-                ccontroller_id = self.get_bytes(data_frame[ind_f:ind_f+1]); ind_f += 1
+                self.values.controller_id = self.get_bytes(data_frame[ind_f:ind_f+1]); ind_f += 1
                 self.values.temp_mos1 = self.get_bytes(data_frame[ind_f:ind_f+2], 10); ind_f += 2
                 self.values.temp_mos2 = self.get_bytes(data_frame[ind_f:ind_f+2], 10); ind_f += 2
                 self.values.temp_mos3 = self.get_bytes(data_frame[ind_f:ind_f+2], 10); ind_f += 2
