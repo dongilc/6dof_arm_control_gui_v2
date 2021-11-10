@@ -146,6 +146,12 @@ def set_release(vesc_target_id):
     send_data = vs.packet_encoding(comm_set_cmd, custom_data)
     return send_data
 
+def set_rcservo_pos_control(vesc_target_id, value):
+    # prepare data
+    comm_set_cmd = vs.COMM_PACKET_ID['COMM_SET_SERVO_POS']
+    send_data = vs.packet_encoding(comm_set_cmd, value)
+    return send_data
+
 def send_cmd(joint_number, cmd, value=0):
     s_class = None
     for i in range(len(vesc_id_data)):
@@ -163,6 +169,9 @@ def send_cmd(joint_number, cmd, value=0):
             print(joint_number, "Released")
         elif cmd == "servo":
             send_data = set_servo_control(vesc_id, value)
+            s_class.serial_write(send_data)
+        elif cmd == "rcservo":
+            send_data = set_rcservo_pos_control(vesc_id, value)
             s_class.serial_write(send_data)
         elif cmd == "terminal":
             # terminal command using CAN_FORWARD
@@ -548,7 +557,7 @@ while True:
 
     if event == "-JOINT2-":
         val = values[event]
-        send_cmd('J2', 'servo', val)
+        send_cmd('J2', 'rcservo', val)
     if event == "-JOINT2_MIN-":
         joint_index = 1
         adjust_joint_limit(joint_index,0,'JOINT2 MIN VALUE:')

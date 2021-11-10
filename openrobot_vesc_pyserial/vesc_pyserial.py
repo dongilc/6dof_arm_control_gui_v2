@@ -64,6 +64,8 @@ def packet_encoding(comm, comm_value = None):
             value = int(comm_value * 1000.0)
         elif command == COMM_PACKET_ID_OPENROBOT['COMM_SET_TRAJ']:
             value = int(comm_value * 1000.0)
+        elif command == COMM_PACKET_ID['COMM_SET_SERVO_POS']:
+            value = int(comm_value * 1000.0)
         elif command == COMM_PACKET_ID['COMM_TERMINAL_CMD']:
             comm_value_bytes = comm_value.encode('utf-8')
             for i in range(len(comm_value_bytes)):
