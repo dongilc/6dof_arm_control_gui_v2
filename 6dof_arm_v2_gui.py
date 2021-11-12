@@ -147,10 +147,25 @@ def set_release(vesc_target_id):
     return send_data
 
 def set_rcservo_pos_control(vesc_target_id, value):
-    # prepare data
-    comm_set_cmd = vs.COMM_PACKET_ID['COMM_SET_SERVO_POS']
-    send_data = vs.packet_encoding(comm_set_cmd, value)
-    return send_data
+    # rcservo command using CAN_FORWARD
+    if vesc_target_id == 0xFF:
+        comm_set_cmd = vs.COMM_PACKET_ID['COMM_SET_SERVO_POS']
+        send_data = vs.packet_encoding(comm_set_cmd, value)
+        return send_data
+    else:
+        comm_set_cmd = vs.COMM_PACKET_ID['COMM_FORWARD_CAN']
+        send_data = vs.packet_encoding(comm_set_cmd, [vesc_target_id, vs.COMM_PACKET_ID['COMM_SET_SERVO_POS'], value])
+
+def set_terminal_cmd(vesc_target_id, value):
+    # terminal command using CAN_FORWARD
+    if vesc_target_id ==  0xFF:
+        comm_set_cmd = vs.COMM_PACKET_ID['COMM_TERMINAL_CMD']
+        send_data = vs.packet_encoding(comm_set_cmd, value)
+        return send_data
+    else:
+        comm_set_cmd = vs.COMM_PACKET_ID['COMM_FORWARD_CAN']
+        send_data = vs.packet_encoding(comm_set_cmd, [vesc_target_id, vs.COMM_PACKET_ID['COMM_TERMINAL_CMD'], value])
+        return send_data
 
 def send_cmd(joint_number, cmd, value=0):
     s_class = None
@@ -162,7 +177,7 @@ def send_cmd(joint_number, cmd, value=0):
 
     if s_class is not None and s_class.usb_connection_flag:
         if vesc_id_data[i][2] == 'Local':
-                vesc_id = 0xFF
+            vesc_id = 0xFF
         if cmd == "release":
             send_data = set_release(vesc_id)
             s_class.serial_write(send_data)
@@ -174,15 +189,8 @@ def send_cmd(joint_number, cmd, value=0):
             send_data = set_rcservo_pos_control(vesc_id, value)
             s_class.serial_write(send_data)
         elif cmd == "terminal":
-            # terminal command using CAN_FORWARD
-            if vesc_id ==  0xFF:
-                comm_set_cmd = vs.COMM_PACKET_ID['COMM_TERMINAL_CMD']
-                send_data = vs.packet_encoding(comm_set_cmd, value)
-                s_class.serial_write(send_data)
-            else:
-                comm_set_cmd = vs.COMM_PACKET_ID['COMM_FORWARD_CAN']
-                send_data = vs.packet_encoding(comm_set_cmd, [vesc_id, vs.COMM_PACKET_ID['COMM_TERMINAL_CMD'], value])
-                s_class.serial_write(send_data)
+            send_data = set_terminal_cmd(vesc_id, value)
+            s_class.serial_write(send_data)
     else:
         print(joint_number, "is Not Connected")
 
