@@ -155,7 +155,8 @@ def set_rcservo_pos_control(vesc_target_id, value):
     else:
         comm_set_cmd = vs.COMM_PACKET_ID['COMM_FORWARD_CAN']
         send_data = vs.packet_encoding(comm_set_cmd, [vesc_target_id, vs.COMM_PACKET_ID['COMM_SET_SERVO_POS'], value])
-
+        return send_data
+        
 def set_terminal_cmd(vesc_target_id, value):
     # terminal command using CAN_FORWARD
     if vesc_target_id ==  0xFF:
